@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matemáticas ESO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #f0c040;
+    --accent2: #5b8cff;
+    --accent3: #ff6b6b;
+    --accent4: #4ecdc4;
+    --text: #e8eaf2;
+    --text-muted: #7a819a;
+    --text-dim: #4a5168;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(91,140,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,140,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .math-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .math-bg span {
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    color: rgba(240,192,64,0.04);
+    font-style: italic;
+    animation: floatSym 20s ease-in-out infinite;
+    user-select: none;
+  }
+  .math-bg span:nth-child(1)  { top: 5%;  left: 3%;  animation-delay: 0s;   font-size: 100px; }
+  .math-bg span:nth-child(2)  { top: 15%; left: 80%; animation-delay: -4s;  font-size: 80px; }
+  .math-bg span:nth-child(3)  { top: 50%; left: 10%; animation-delay: -8s;  font-size: 70px; }
+  .math-bg span:nth-child(4)  { top: 70%; left: 60%; animation-delay: -12s; font-size: 90px; }
+  .math-bg span:nth-child(5)  { top: 35%; left: 45%; animation-delay: -6s;  font-size: 60px; }
+  .math-bg span:nth-child(6)  { top: 85%; left: 20%; animation-delay: -10s; font-size: 110px; }
+  .math-bg span:nth-child(7)  { top: 25%; left: 92%; animation-delay: -2s;  font-size: 75px; }
+
+  @keyframes floatSym {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50%       { transform: translateY(-30px) rotate(5deg); }
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 2.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    background: rgba(13,15,20,0.85);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .logo-symbol {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #0d0f14;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .logo-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  nav a {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  nav a:hover {
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  /* Dropdown */
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dropdown-btn:hover, .dropdown-btn.open {
+    color: var(--text);
+    border-color: var(--accent2);
+  }
+
+  .dropdown-arrow {
+    font-size: 0.6rem;
+    transition: transform 0.2s;
+  }
+  .dropdown-btn.open .dropdown-arrow { transform: rotate(180deg); }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    z-index: 200;
+  }
+  .dropdown-menu.open { display: block; }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .dropdown-item:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .dropdown-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(240,192,64,0.05);
+  }
+
+  .dropdown-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 4.5rem 2.5rem 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5.5vw, 5rem);
+    line-height: 1.06;
+    font-weight: 700;
+    animation: fadeUp 0.6s ease 0.05s both;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    margin-top: 1.2rem;
+    font-size: 1rem;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.7;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2.5rem 2.5rem;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+
+  .search-box {
+    position: relative;
+    max-width: 420px;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--accent2); }
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .search-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2.5rem 6rem;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.38rem 0.9rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { background: var(--surface2); color: var(--text); }
+  .filter-btn.active { background: var(--surface2); color: var(--text); border-color: var(--border); }
+  .filter-btn.active.f-apuntes    { border-color: var(--accent2); color: var(--accent2); }
+  .filter-btn.active.f-ejercicios { border-color: var(--accent);  color: var(--accent); }
+  .filter-btn.active.f-html       { border-color: var(--accent4); color: var(--accent4); }
+
+  /* Unit section */
+  .unit-section { margin-bottom: 3.5rem; }
+
+  .unit-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .unit-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .unit-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-style: italic;
+  }
+
+  /* Cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.9rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.1rem 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card.type-apuntes::before    { background: var(--accent2); }
+  .card.type-ejercicios::before { background: var(--accent); }
+  .card.type-html::before       { background: var(--accent4); }
+
+  .card:hover {
+    border-color: var(--surface2);
+    background: var(--surface2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-type {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .type-icon {
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  .type-apuntes   .type-icon { background: rgba(91,140,255,0.15);  color: var(--accent2); }
+  .type-ejercicios .type-icon { background: rgba(240,192,64,0.15);  color: var(--accent); }
+  .type-html      .type-icon { background: rgba(78,205,196,0.15);  color: var(--accent4); }
+
+  .type-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.45;
+    margin-bottom: 0.45rem;
+  }
+
+  .card-meta {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .card-arrow {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s;
+  }
+  .card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  /* Empty state */
+  .empty-state {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+  }
+  .empty-state.visible { display: block; }
+  .empty-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.2rem;
+    max-width: 460px;
+    width: 90%;
+    animation: modalIn 0.25s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+    clear: both;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    margin-bottom: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .modal-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: #0d0f14;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.6rem 1.3rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    text-decoration: none;
+  }
+  .modal-btn:hover { opacity: 0.85; }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  footer span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+  .footer-eq {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 0 1.25rem; }
+    .logo-name { display: none; }
+    .hero, .search-wrap, .main { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .hero { padding-top: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="math-bg">
+  <span>∑</span><span>∫</span><span>π</span><span>√</span><span>∞</span><span>Δ</span><span>θ</span>
+</div>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-symbol">f(x)</div>
+    <span class="logo-name">Matemáticas ESO</span>
+  </a>
+  <nav>
+    <a href="mailto:profesor@ies.es">Contacto</a>
+
+    <!-- Dropdown de cursos -->
+    <div class="dropdown" id="courseDropdown">
+      <button class="dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">
+        <span id="dropdownLabel">Curso</span>
+        <span class="dropdown-arrow">▾</span>
+      </button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item active" onclick="selectCourse('all', this)">
+          <span class="dropdown-dot" style="background:var(--accent)"></span>Todos los cursos
+        </div>
+        <div class="dropdown-item" onclick="selectCourse('1eso', this)">
+          <span class="dropdown-dot" style="background:var(--accent2)"></span>1º ESO
+        </div>
+        <div class="dropdown-item" onclick="selectCourse('2eso', this)">
+          <span class="dropdown-dot" style="background:var(--accent4)"></span>2º ESO
+        </div>
+        <div class="dropdown-item" onclick="selectCourse('3eso', this)">
+          <span class="dropdown-dot" style="background:var(--accent)"></span>3º ESO
+        </div>
+        <div class="dropdown-item" onclick="selectCourse('4eso', this)">
+          <span class="dropdown-dot" style="background:var(--accent3)"></span>4º ESO
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Todo lo que<br>necesitas para<br><em>aprender.</em></h1>
+  <p class="hero-sub">Apuntes, ejercicios y materiales interactivos organizados por unidades didácticas.</p>
+</section>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Buscar material o tema…" oninput="applyFilters()">
+  </div>
+</div>
+
+<main class="main" id="unidades">
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setTypeFilter('all', this)">Todos</button>
+    <button class="filter-btn f-apuntes"    onclick="setTypeFilter('apuntes', this)">📄 Apuntes</button>
+    <button class="filter-btn f-ejercicios" onclick="setTypeFilter('ejercicios', this)">✏️ Ejercicios</button>
+    <button class="filter-btn f-html"       onclick="setTypeFilter('html', this)">⚡ Interactivos</button>
+  </div>
+
+  <!-- UNIDAD 1 -->
+  <div class="unit-section" data-course="1eso">
+    <div class="unit-header">
+      <span class="unit-num">Unidad 01</span>
+      <h2 class="unit-title">Números Enteros y Racionales</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card type-apuntes" href="#" onclick="openModal('Números Enteros: teoría y operaciones','apuntes','Teoría completa sobre números enteros, valor absoluto, operaciones y jerarquía. Incluye ejemplos resueltos y resumen final.','PDF · 8 páginas'); return false;">
+        <div class="card-type"><div class="type-icon">📄</div><span class="type-label">Apuntes PDF</span></div>
+        <div class="card-title">Números Enteros: teoría y operaciones</div>
+        <div class="card-meta">PDF · 8 páginas</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-ejercicios" href="#" onclick="openModal('Operaciones con enteros — 30 problemas','ejercicios','Batería de 30 ejercicios graduados por dificultad. Incluye soluciones al final del documento.','PDF · 30 ejercicios'); return false;">
+        <div class="card-type"><div class="type-icon">✏️</div><span class="type-label">Ejercicios</span></div>
+        <div class="card-title">Operaciones con enteros — 30 problemas</div>
+        <div class="card-meta">PDF · 30 ejercicios</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-html" href="#" onclick="openModal('Visualizador: Recta Numérica','html','Herramienta interactiva para visualizar números enteros y racionales en la recta numérica. Incluye ejercicios de posicionamiento.','HTML interactivo'); return false;">
+        <div class="card-type"><div class="type-icon">⚡</div><span class="type-label">Interactivo HTML</span></div>
+        <div class="card-title">Visualizador: Recta Numérica</div>
+        <div class="card-meta">HTML interactivo</div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- UNIDAD 2 -->
+  <div class="unit-section" data-course="2eso">
+    <div class="unit-header">
+      <span class="unit-num">Unidad 02</span>
+      <h2 class="unit-title">Álgebra y Ecuaciones</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card type-apuntes" href="#" onclick="openModal('Álgebra básica: monomios y polinomios','apuntes','Introducción al lenguaje algebraico, monomios, polinomios y reglas de operación. Ejemplos guiados incluidos.','PDF · 10 páginas'); return false;">
+        <div class="card-type"><div class="type-icon">📄</div><span class="type-label">Apuntes PDF</span></div>
+        <div class="card-title">Álgebra básica: monomios y polinomios</div>
+        <div class="card-meta">PDF · 10 páginas</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-ejercicios" href="#" onclick="openModal('Ecuaciones de 1.er grado — con soluciones','ejercicios','Colección de ecuaciones de primer grado con soluciones detalladas. Progresión por niveles de dificultad.','PDF · 25 ejercicios'); return false;">
+        <div class="card-type"><div class="type-icon">✏️</div><span class="type-label">Ejercicios</span></div>
+        <div class="card-title">Ecuaciones de 1.er grado — con soluciones</div>
+        <div class="card-meta">PDF · 25 ejercicios</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-html" href="#" onclick="openModal('Simulador: Balanza Algebraica','html','Simulador de balanza para entender el concepto de ecuación de forma visual e intuitiva. Arrastra pesas y variables.','HTML interactivo'); return false;">
+        <div class="card-type"><div class="type-icon">⚡</div><span class="type-label">Interactivo HTML</span></div>
+        <div class="card-title">Simulador: Balanza Algebraica</div>
+        <div class="card-meta">HTML interactivo</div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- UNIDAD 3 -->
+  <div class="unit-section" data-course="3eso">
+    <div class="unit-header">
+      <span class="unit-num">Unidad 03</span>
+      <h2 class="unit-title">Geometría y Trigonometría</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card type-apuntes" href="#" onclick="openModal('Triángulos y Teorema de Pitágoras','apuntes','Teoría sobre triángulos rectángulos, Teorema de Pitágoras y sus aplicaciones. Diagramas incluidos.','PDF · 7 páginas'); return false;">
+        <div class="card-type"><div class="type-icon">📄</div><span class="type-label">Apuntes PDF</span></div>
+        <div class="card-title">Triángulos y Teorema de Pitágoras</div>
+        <div class="card-meta">PDF · 7 páginas</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-ejercicios" href="#" onclick="openModal('Geometría aplicada — problemas reales','ejercicios','20 problemas de geometría con contexto real: arquitectura, cartografía y diseño. Con soluciones.','PDF · 20 ejercicios'); return false;">
+        <div class="card-type"><div class="type-icon">✏️</div><span class="type-label">Ejercicios</span></div>
+        <div class="card-title">Geometría aplicada — problemas reales</div>
+        <div class="card-meta">PDF · 20 ejercicios</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-html" href="#" onclick="openModal('Constructor de Figuras Geométricas','html','Herramienta para construir y medir figuras geométricas, calcular áreas y perímetros de forma dinámica.','HTML interactivo'); return false;">
+        <div class="card-type"><div class="type-icon">⚡</div><span class="type-label">Interactivo HTML</span></div>
+        <div class="card-title">Constructor de Figuras Geométricas</div>
+        <div class="card-meta">HTML interactivo</div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- UNIDAD 4 -->
+  <div class="unit-section" data-course="4eso">
+    <div class="unit-header">
+      <span class="unit-num">Unidad 04</span>
+      <h2 class="unit-title">Funciones y Estadística</h2>
+    </div>
+    <div class="cards-grid">
+      <a class="card type-apuntes" href="#" onclick="openModal('Funciones lineales y cuadráticas','apuntes','Definición de función, dominio, recorrido, representación gráfica de funciones lineales y cuadráticas.','PDF · 9 páginas'); return false;">
+        <div class="card-type"><div class="type-icon">📄</div><span class="type-label">Apuntes PDF</span></div>
+        <div class="card-title">Funciones lineales y cuadráticas</div>
+        <div class="card-meta">PDF · 9 páginas</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-ejercicios" href="#" onclick="openModal('Estadística descriptiva — ejercicios','ejercicios','Problemas sobre media, mediana, moda, desviación típica y representación gráfica de datos.','PDF · 18 ejercicios'); return false;">
+        <div class="card-type"><div class="type-icon">✏️</div><span class="type-label">Ejercicios</span></div>
+        <div class="card-title">Estadística descriptiva — ejercicios</div>
+        <div class="card-meta">PDF · 18 ejercicios</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="card type-html" href="#" onclick="openModal('Graficador dinámico de funciones','html','Introduce cualquier función y visualiza su gráfica al instante. Soporta funciones lineales, cuadráticas, trigonométricas y más.','HTML interactivo'); return false;">
+        <div class="card-type"><div class="type-icon">⚡</div><span class="type-label">Interactivo HTML</span></div>
+        <div class="card-title">Graficador dinámico de funciones</div>
+        <div class="card-meta">HTML interactivo</div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">∅</div>
+    No hay materiales que coincidan con la búsqueda.
+  </div>
+
+</main>
+
+<footer>
+  <span>Matemáticas ESO</span>
+  <span class="footer-eq">a² + b² = c²</span>
+  <span>Hecho con ♥ para mis alumnos</span>
+</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-type" id="modalType"></div>
+    <h3 class="modal-title" id="modalTitle"></h3>
+    <p class="modal-desc" id="modalDesc"></p>
+    <div class="modal-meta" id="modalMeta"></div>
+    <a href="#" class="modal-btn">Abrir material →</a>
+  </div>
+</div>
+
+<script>
+  let activeType   = 'all';
+  let activeCourse = 'all';
+
+  // ── Dropdown ──
+  function toggleDropdown() {
+    const btn  = document.getElementById('dropdownBtn');
+    const menu = document.getElementById('dropdownMenu');
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+  }
+
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('courseDropdown');
+    if (!dd.contains(e.target)) {
+      document.getElementById('dropdownBtn').classList.remove('open');
+      document.getElementById('dropdownMenu').classList.remove('open');
+    }
+  });
+
+  const courseLabels = {
+    all: 'Curso', '1eso': '1º ESO', '2eso': '2º ESO', '3eso': '3º ESO', '4eso': '4º ESO'
+  };
+
+  function selectCourse(course, el) {
+    activeCourse = course;
+    document.getElementById('dropdownLabel').textContent = courseLabels[course];
+    document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('dropdownBtn').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+    applyFilters();
+  }
+
+  // ── Type filter ──
+  function setTypeFilter(type, btn) {
+    activeType = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  // ── Combined filter ──
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let anyVisible = false;
+
+    document.querySelectorAll('.unit-section').forEach(sec => {
+      const courseMatch = activeCourse === 'all' || sec.dataset.course === activeCourse;
+      if (!courseMatch) { sec.style.display = 'none'; return; }
+
+      let secVisible = false;
+      sec.querySelectorAll('.card').forEach(card => {
+        const typeMatch   = activeType === 'all' || card.classList.contains('type-' + activeType);
+        const searchMatch = q === '' || card.innerText.toLowerCase().includes(q);
+        const show = typeMatch && searchMatch;
+        card.style.display = show ? 'block' : 'none';
+        if (show) secVisible = true;
+      });
+
+      sec.style.display = secVisible ? 'block' : 'none';
+      if (secVisible) anyVisible = true;
+    });
+
+    document.getElementById('emptyState').classList.toggle('visible', !anyVisible);
+  }
+
+  // ── Modal ──
+  const typeLabels = {
+    apuntes:    '📄 Apuntes PDF',
+    ejercicios: '✏️ Ejercicios',
+    html:       '⚡ Interactivo HTML'
+  };
+
+  function openModal(title, type, desc, meta) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalType').textContent  = typeLabels[type] || type;
+    document.getElementById('modalDesc').textContent  = desc;
+    document.getElementById('modalMeta').textContent  = meta;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Staggered entrance
+  document.querySelectorAll('.card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(14px)';
+    card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 80 + i * 35);
+  });
+</script>
+</body>
+</html>
